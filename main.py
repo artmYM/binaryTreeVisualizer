@@ -1,6 +1,7 @@
 import graphviz
 import tkinter as tk
 from tkinter import simpledialog, messagebox, font
+import random
 
 class TreeNode:
     def __init__(self, value):
@@ -125,13 +126,14 @@ class BinarySearchTreeNode:
         return self.left.find_min()
 
 def build_tree(elements):
-    print("Building tree with these elements:", elements)
     root = BinarySearchTreeNode(elements[0])
-
     for i in range(1, len(elements)):
         root.add_child(elements[i])
-
     return root
+
+def generate_random_tree(size=7):
+    elements = random.sample(range(1, 100), size)
+    return build_tree(elements)
 
 class TreeApp:
     def __init__(self, root):
@@ -142,7 +144,7 @@ class TreeApp:
 
     def init_ui(self):
         self.root.title("Binary Search Tree Visualizer")
-        self.root.geometry("400x700")
+        self.root.geometry("400x800")
 
         self.main_font = font.Font(size=14)
 
@@ -157,6 +159,9 @@ class TreeApp:
 
         self.visualize_button = tk.Button(self.root, text="Visualize Tree", command=self.visualize_tree, font=self.main_font, width=20, height=2, bg="#008CBA", fg="white")
         self.visualize_button.pack(pady=10)
+
+        self.exercise_button = tk.Button(self.root, text="Exercise", command=self.exercise, font=self.main_font, width=20, height=2, bg="#FFA500", fg="white")
+        self.exercise_button.pack(pady=10)
 
         self.inorder_label = tk.Label(self.root, text="In-order Traversal: []", font=self.main_font)
         self.inorder_label.pack(pady=10)
@@ -216,6 +221,57 @@ class TreeApp:
         graph = visualizer.visualize(self.tree)
         graph.render('binary_tree', format='png', cleanup=True)
         graph.view()
+
+    def exercise(self):
+        exercise_window = tk.Toplevel(self.root)
+        exercise_window.title("Exercise")
+        exercise_window.geometry("400x600")
+        exercise_font = font.Font(size=14)
+
+        random_tree = generate_random_tree()
+        in_order = random_tree.in_order_traversal()
+        pre_order = random_tree.pre_order_traversal()
+        post_order = random_tree.post_order_traversal()
+
+        visualizer = TreeVisualizer()
+        graph = visualizer.visualize(random_tree)
+        graph.render('exercise_tree', format='png', cleanup=True)
+        graph.view()
+
+        tk.Label(exercise_window, text="In-order Traversal:", font=exercise_font).pack(pady=10)
+        inorder_entry = tk.Entry(exercise_window, font=exercise_font)
+        inorder_entry.pack(pady=10)
+
+        tk.Label(exercise_window, text="Pre-order Traversal:", font=exercise_font).pack(pady=10)
+        preorder_entry = tk.Entry(exercise_window, font=exercise_font)
+        preorder_entry.pack(pady=10)
+
+        tk.Label(exercise_window, text="Post-order Traversal:", font=exercise_font).pack(pady=10)
+        postorder_entry = tk.Entry(exercise_window, font=exercise_font)
+        postorder_entry.pack(pady=10)
+
+        def check_answers():
+            try:
+                user_inorder = list(map(int, inorder_entry.get().split()))
+                user_preorder = list(map(int, preorder_entry.get().split()))
+                user_postorder = list(map(int, postorder_entry.get().split()))
+
+                correct_inorder = (user_inorder == in_order)
+                correct_preorder = (user_preorder == pre_order)
+                correct_postorder = (user_postorder == post_order)
+
+                if correct_inorder and correct_preorder and correct_postorder:
+                    messagebox.showinfo("Result", "All answers are correct!")
+                else:
+                    messagebox.showerror("Result", "Some answers are incorrect.\n"
+                                                   f"Correct In-order: {in_order}\n"
+                                                   f"Correct Pre-order: {pre_order}\n"
+                                                   f"Correct Post-order: {post_order}")
+            except ValueError:
+                messagebox.showerror("Error", "Please enter valid integer values separated by spaces.")
+
+        submit_button = tk.Button(exercise_window, text="Submit", command=check_answers, font=exercise_font, bg="#4CAF50", fg="white", width=20, height=2)
+        submit_button.pack(pady=20)
 
 if __name__ == "__main__":
     root = tk.Tk()
